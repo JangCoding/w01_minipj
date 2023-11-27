@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>미니프로젝트</title>
+
+  <!-- jQuery CDN 미리 만둘어둔 기능 임포트 -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+  <!-- 부트스트랩 : 다른 사람들이 미리 작성해둔 세팅 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <style>
+    .empty_space {
+      background-color: rgb(160, 204, 204);
+      height: 150px;
+    }
+
+    .title {
+      background-color: rgb(75, 240, 75);
+      height: 200px;
+    }
+
+    .team {
+
+      background-color: rgb(92, 94, 250);
+      height: 300px;
+    }
+
+    .team_mate {
+      background-color: rgb(195, 238, 76);
+      height: 300px;
+    }
+
+    .behind {
+      background-color: rgb(243, 124, 233);
+      height: 300px;
+    }
+  </style>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+  <!-- type "module" 추가. 추가시 onclick 기능 안됨 -->
+  <script type="module">
+    // Firebase SDK 라이브러리 가져오기
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+
+
+    // Firebase 구성 정보 설정 / 프로젝트설정 > 구성
+    const firebaseConfig = {
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+      apiKey: "AIzaSyAHVG8hDqtLmf0yJcUy3NX1RLYaCZLjMqw",
+      authDomain: "sparta-ce0ab.firebaseapp.com",
+      projectId: "sparta-ce0ab",
+      storageBucket: "sparta-ce0ab.appspot.com",
+      messagingSenderId: "909906331233",
+      appId: "1:909906331233:web:a947163b5b79eceac98c20",
+      measurementId: "G-E0DZ1PR5Q0"
+
+    };
+
+
+    // Firebase 인스턴스 초기화
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+
+
+
+    $("#mainbtn").click(async function () {
+      //openclose() 함수 내용 가져오기
+      // toggle() : 껐다켜기. 사실 div style="display : none" 으로 전환된것      
+      $('#team_div').fadeOut();
+      $('#teammate_div').fadeOut();
+      $('#behind_div').fadeOut();
+
+      $('#empty_div').fadeIn();
+    });
+    $("#teambtn").click(async function () {
+      $('#empty_div').fadeOut();
+      $('#teammate_div').fadeOut();
+      $('#behind_div').fadeOut();
+
+      $('#team_div').fadeIn();
+    });
+    $("#teammatebtn").click(async function () {
+      $('#empty_div').fadeOut();
+      $('#team_div').fadeOut();
+      $('#behind_div').fadeOut();
+
+      $('#teammate_div').fadeIn();
+    });
+    $("#behindbtn").click(async function () {
+      $('#empty_div').fadeOut();
+      $('#team_div').fadeOut();
+      $('#teammate_div').fadeOut();
+
+      $('#behind_div').fadeIn();
+    });
+
+
+
+    // Teammate > 팀원 선택
+//     $(".matebtn").click(async function () {
+//     // 클릭된 버튼의 ID 가져오기
+//     let buttonId = $(this).attr("id");
+//     console.log(buttonId);
+
+//     // Firestore에서 해당 컬렉션에 대한 참조 가져오기
+//     const docs = getDocs(collection(db, "Teammates", buttonId));
+
+//     console.log(docs);
+// });
+ 
+$(".matebtn").click(async function () {
+    let docs = await getDocs(collection(db, "Teammates"));
+    console.log(docs);
+
+    let buttonId = $(this).attr("id");
+    let row;
+
+    if(buttonId=='jjh')    {
+      row = docs.docs[0];
+    }
+    else if(buttonId=='ljw')    {
+      row = docs.docs[1];
+    }
+    else if(buttonId=='ojy')    {
+      row = docs.docs[2];
+    }
+    else {
+        console.log("No data found for", buttonId);
+    }
+
+    let img = row.get('img');
+    let name = row.get('name');
+    let mbti = row.get('mbti');
+    let comment = row.get('comment');
+    let tmi = row.get('tmi');
+
+    $('#teammate_card').empty();
+    let temp_html=`
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="${img}" class="img-fluid rounded-start" alt="...">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">이름 : ${name}</h5>
+              <p class="card-text">MBTI : ${mbti}</p>
+              <p class="card-text">한마디 : ${comment}</p> 
+              <p class="card-text"><small class="text-body-secondary">TMI : ${tmi}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    $('#teammate_card').append(temp_html); 
+});
+
+  </script>
+</head>
+
+<body>
+  <div id="empty_div" class="empty_space">
+    <p>empty_space</p>
+
+  </div>
+  <div id="title_div" class="title">
+    <p>title</p>
+    <button id="mainbtn">main</button>
+    <button id="teambtn">team</button>
+    <button id="teammatebtn">teammate</button>
+    <button id="behindbtn">behind</button>
+
+  </div>
+  <div id="team_div" class="team" style="display: none">
+    <p>team</p>
+
+  </div>
+  <div id="teammate_div" class="team_mate" style="display: none">
+    <p>team mates</p>
+
+    <div id=teammate_card>
+      <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="..." class="img-fluid rounded-start" alt="...">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional
+                content. This content is a little bit longer.</p>
+              <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="matebtn" id="jjh">장준혁</button>
+    <button class="matebtn" id="ljw">이제원</button>
+    <button class="matebtn" id="ojy">오재영</button>
+
+
+  </div>
+  <div id="behind_div" class="behind" style="display: none">
+    <p>behind</p>
+
+
+  </div>
+
+
+</body>
+
+</html>
